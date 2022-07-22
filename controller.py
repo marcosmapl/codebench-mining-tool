@@ -188,6 +188,7 @@ class AtividadeController(EntityController):
 
 
 class UsuarioController(EntityController):
+
     __csv_filename = 'estudantes.csv'
     __estudante_folder_name = 'users'
     __estudante_file_name = 'user.data'
@@ -395,7 +396,7 @@ class CodeMirrorController(EntityController):
     @staticmethod
     def extract(path: str):
         codemirror_list = []
-        with open(path, 'r') as arquivo:
+        with open(path, 'r', encoding='utf-8') as arquivo:
             for line in [x for x in arquivo.readlines() if CodeMirrorController.__pattern.match(x)]:
                 data = line.split('#')
                 date_obj = datetime.strptime(data[0].strip(), '%Y-%m-%d %H:%M:%S.%f')

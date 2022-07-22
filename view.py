@@ -95,17 +95,26 @@ class MainScreen:
                     for node_ex in nodes_ex:
                         if node_ex.is_file():
                             Logger.info(f'Extraindo tentativas do arquivo: {node_ex.path}')
-                            tentativas.extend(TentativaController.extract(node_ex.path))
+                            try:
+                                tentativas.extend(TentativaController.extract(node_ex.path))
+                            except Exception as err:
+                                Logger.error(str(err))
                 with os.scandir(os.path.join(usuario.path, CodeMirrorController.get_codemirror_folder_name())) as nodes_m:
                     for node_m in nodes_m:
                         if node_m.is_file():
                             Logger.info(f'Extraindo logs do codemirror do arquivo: {node_ex.path}')
-                            codemirror.extend(TentativaController.extract(node_m.path))
+                            try:
+                                codemirror.extend(CodeMirrorController.extract(node_m.path))
+                            except Exception as err:
+                                Logger.error(str(err))
                 with os.scandir(os.path.join(usuario.path, NotaController.get_grade_folder_name())) as nodes_g:
                     for node_g in nodes_g:
                         if node_g.is_file() and not node_g.name.startswith('final_grade'):
                             Logger.info(f'Extraindo notas do arquivo: {node_g.path}')
-                            notas.append(NotaController.extract(node_g.path))
+                            try:
+                                notas.append(NotaController.extract(node_g.path))
+                            except Exception as err:
+                                Logger.error(str(err))
             TentativaController.persist(tentativas)
             CodeMirrorController.persist(codemirror)
             NotaController.persist(notas)
