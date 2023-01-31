@@ -25,11 +25,11 @@ from model import *
 
 class EntityController:
     # diretório dos arquivos de saída '.csv' (datasets)
-    __output_dir = os.path.join(os.getcwd(), 'csv')
+    CSV_FILE_OUTPUT_DIR = os.path.join(os.getcwd(), 'csv')
 
     @staticmethod
     def get_output_dir():
-        return EntityController.__output_dir
+        return EntityController.CSV_FILE_OUTPUT_DIR
 
     @staticmethod
     def extract(path: str):
@@ -37,7 +37,7 @@ class EntityController:
 
     @staticmethod
     def persist(entities, path=None, header=None):
-        Logger.info(f'Salvando entidades no arquivo: {path}')
+        Logger.info(f'Salvando entidades no arquivo de saída: {path}')
         rows = []
         for entidade in entities:
             rows.append(entidade.as_list())
@@ -50,43 +50,45 @@ class EntityController:
         """Cria a pasta e os arquivos de saídas '.csv' (datasets)."""
         try:
             # se o diretório de saída existir, apaga seu conteúdo
-            if not os.path.exists(EntityController.__output_dir):
-                os.mkdir(EntityController.__output_dir)
+            if not os.path.exists(EntityController.CSV_FILE_OUTPUT_DIR):
+                os.mkdir(EntityController.CSV_FILE_OUTPUT_DIR)
         except OSError:
-            Logger.error('Erro ao criar diretório de saída!')
+            Logger.error('Erro ao criar diretório de saída dos arquivos CSV!')
 
 
 class PeriodoController(EntityController):
-    __csv_filename = 'periodos.csv'
+    CSV_FILENAME = 'periodos.csv'
 
     @staticmethod
     def extract(path: str):
-        p = Periodo(path.split(os.path.sep)[-1], 0, 0, 0, 0, 0, path)
+        periodo = Periodo(path.split(os.path.sep)[-1], 0, 0, 0, 0, 0, path)
         with os.scandir(path) as nodes_t:
-            for node_t in nodes_t:
-                p.n_turmas += 1
-                if node_t.is_dir():
-                    with os.scandir(os.path.join(node_t.path, 'assessments')) as nodes_a:
-                        for _ in nodes_a:
-                            p.n_atividades += 1
-                    with os.scandir(os.path.join(node_t.path, 'users')) as nodes_e:
-                        for node_e in nodes_e:
-                            p.n_estudantes += 1
-                            if node_e.is_dir():
-                                with os.scandir(os.path.join(node_e.path, 'codes')) as nodes_codes:
-                                    for _ in nodes_codes:
-                                        p.n_codes += 1
-                                with os.scandir(os.path.join(node_e.path, 'executions')) as nodes_exec:
-                                    for _ in nodes_exec:
-                                        p.n_tentativas += 1
+            for turma_dir in turmas_dir:
+                periodo.n_turmas += 1
+                if turma_dir.is_dir():
+                    with os.scandir(os.path.join(turma_dir.path, 'assessments')) as atividades_dir:
+                        print(len(atividades_dir))
+                        # for _ in atividades_dir:
+                            # periodo.n_atividades += 1
+                    # with os.scandir(os.path.join(node_t.path, 'users')) as nodes_e:
+                        # for node_e in nodes_e:
+                            # p.n_estudantes += 1
+                            # if node_e.is_dir():
+                                # with os.scandir(os.path.join(node_e.path, 'codes')) as nodes_codes:
+                                    # for _ in nodes_codes:
+                                        # p.n_codes += 1
+                                # with os.scandir(os.path.join(node_e.path, 'executions')) as nodes_exec:
+                                    # for _ in nodes_exec:
+                                        # p.n_tentativas += 1
 
-        return p
+        return periodo
 
     @staticmethod
     def persist(entities, path=None, header=None):
-        return EntityController.persist(entities, os.path.join(EntityController.get_output_dir(),
-                                                               PeriodoController.__csv_filename),
-                                        Periodo.get_lista_atributos())
+        return EntityController.persist(
+            entities,
+            os.path.join(EntityController.get_output_dir(), PeriodoController.CSV_FILENAME), Periodo.get_lista_atributos()
+        )
 
 
 class TurmaController(EntityController):

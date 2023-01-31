@@ -4,59 +4,130 @@
 ### Instituto de Computação - IComp
 import os
 import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
 
 from controller import PeriodoController, TurmaController, AtividadeController, UsuarioController, \
     TentativaController, AcessoController, NotaController, MousemoveController, CodeMirrorController, SolucaoEstudanteController
 from util import Logger
 
 
-class MainScreen:
+class MainScreen(tk.Tk):
 
-    __dataset_path = ''
+    COLOR_DARK_GREEN = '#062315'
+    COLOR_DARK_GRAY = '#444444'
+    COLOR_CYPRUS = '#06373A'
+    COLOR_EDEN = '#1F5F5B'
+    COLOR_SOLEM = '#159947'
+    COLOR_OCEAN_GREEN = '#49B265'
+    COLOR_PASTEL_GRAY = '#CAD2C5'
+    COLOR_BACKGROUND = COLOR_DARK_GRAY
+    COLOR_FOREGROUND = COLOR_PASTEL_GRAY
 
-    def __init__(self, name, version):
+    def __init__(self, name: str, version: str, screen_width: int, screen_height: int):
+        super().__init__()
+        # configurações básicas da interface
         self.name = name
         self.version = version
+        self.title(string=f'{name} v{version}')
 
-        self.root = tk.Tk()
-        self.root.title(string=f'{name} v{version}')
+        # width x height (comprimento x altura)
+        self.window_width = screen_width
+        self.window_height = screen_height
+        self.geometry(f"{screen_width}x{screen_height}")
+        self.resizable(False, False)
 
-        self.frm_codebench = tk.Frame(master=self.root, relief=tk.GROOVE, borderwidth=5, padx=5, pady=5)
-        self.frm_codebench.pack(side=tk.TOP)
+        # configurações de aparência
+        self.configure(background=MainScreen.COLOR_BACKGROUND)
+        self.estilo = ttk.Style(self)
+        self.estilo.configure('cbminer.label.TLabel', background=MainScreen.COLOR_BACKGROUND, foreground=MainScreen.COLOR_FOREGROUND)
 
-        self.dataset_path = tk.StringVar(self.root)
+        self.dataset_path = tk.StringVar(self)
 
-        self.lbl_codebench_path = tk.Label(master=self.frm_codebench, text='INSIRA O CAMINHO PARA O DATASET CODEBENCH: ', anchor='w')
-        self.lbl_codebench_path.pack(fill=tk.X, side=tk.TOP)
-        self.ent_codebench_path = tk.Entry(master=self.frm_codebench, width=120, textvariable=self.dataset_path)
-        self.ent_codebench_path.pack(fill=tk.X, side=tk.BOTTOM)
+        self.lbl_codebench_path = ttk.Label(master=self, text='INSIRA O CAMINHO PARA O DATASET CODEBENCH: ', style='cbminer.label.TLabel')
+        self.lbl_codebench_path.place(x=25, y=25)
+        self.ent_codebench_path = tk.Entry(master=self, width=120, textvariable=self.dataset_path)
+        self.ent_codebench_path.place(x=25, y=60)
 
-        self.frm_buttons = tk.Frame(master=self.root, relief=tk.FLAT, borderwidth=5, padx=5, pady=5)
-        self.frm_buttons.pack(side=tk.BOTTOM, fill=tk.X)
+        self.frm_opcoes = tk.LabelFrame(master=self, text='OPÇÕES DE EXTRAÇÃO   ', bg=MainScreen.COLOR_BACKGROUND, fg=MainScreen.COLOR_FOREGROUND)
+        self.frm_opcoes.place(x=25, y=105, width=1000, height=240)
+
+        self.var_extrair_social = tk.BooleanVar()
+        self.check_social = tk.Checkbutton(
+            self.frm_opcoes, 
+            text='DADOS SOCIAIS', 
+            variable=self.var_extrair_social, 
+            onvalue=True, 
+            offvalue=False, 
+            bg=MainScreen.COLOR_BACKGROUND, 
+            fg=MainScreen.COLOR_FOREGROUND, 
+            highlightbackground=MainScreen.COLOR_BACKGROUND, 
+            activebackground=MainScreen.COLOR_BACKGROUND, 
+            activeforeground=MainScreen.COLOR_OCEAN_GREEN, 
+            selectcolor=MainScreen.COLOR_OCEAN_GREEN
+        )
+        self.check_social.place(x=15, y=15)
+
+        self.var_extrair_tentativas = tk.BooleanVar()
+        self.check_tentativas = tk.Checkbutton(
+            self.frm_opcoes, 
+            text='DADOS DAS TENTATIVAS', 
+            variable=self.var_extrair_tentativas, 
+            onvalue=True, 
+            offvalue=False, 
+            bg=MainScreen.COLOR_BACKGROUND, 
+            fg=MainScreen.COLOR_FOREGROUND, 
+            highlightbackground=MainScreen.COLOR_BACKGROUND, 
+            activebackground=MainScreen.COLOR_BACKGROUND, 
+            activeforeground=MainScreen.COLOR_OCEAN_GREEN, 
+            selectcolor=MainScreen.COLOR_OCEAN_GREEN
+        )
+        self.check_tentativas.place(x=15, y=40)
+
+        self.var_extrair_metricas = tk.BooleanVar()
+        self.check_metricas = tk.Checkbutton(
+            self.frm_opcoes, 
+            text='DADOS MÉTRIACAS DE CÓDIGO', 
+            variable=self.var_extrair_metricas, 
+            onvalue=True, 
+            offvalue=False, 
+            bg=MainScreen.COLOR_BACKGROUND, 
+            fg=MainScreen.COLOR_FOREGROUND, 
+            highlightbackground=MainScreen.COLOR_BACKGROUND, 
+            activebackground=MainScreen.COLOR_BACKGROUND, 
+            activeforeground=MainScreen.COLOR_OCEAN_GREEN, 
+            selectcolor=MainScreen.COLOR_OCEAN_GREEN
+        )
+        self.check_metricas.place(x=15, y=65)
+
+        self.var_extrair_mousemove = tk.BooleanVar()
+        self.check_mousemove = tk.Checkbutton(
+            self.frm_opcoes, 
+            text='DADOS EVENTOS DO MOUSE', 
+            variable=self.var_extrair_mousemove, 
+            onvalue=True, 
+            offvalue=False, 
+            bg=MainScreen.COLOR_BACKGROUND, 
+            fg=MainScreen.COLOR_FOREGROUND, 
+            highlightbackground=MainScreen.COLOR_BACKGROUND, 
+            activebackground=MainScreen.COLOR_BACKGROUND, 
+            activeforeground=MainScreen.COLOR_OCEAN_GREEN, 
+            selectcolor=MainScreen.COLOR_OCEAN_GREEN
+        )
+        self.check_mousemove.place(x=15, y=90)
+
+        self.btn_extrair = tk.Button(master=self, text='EXTRAIR', font=('Arial', 24), bg=MainScreen.COLOR_EDEN, foreground=MainScreen.COLOR_PASTEL_GRAY, activeforeground=MainScreen.COLOR_EDEN)
+        self.btn_extrair.place(x=860, y=360)
 
         self.progress_string = tk.StringVar()
         self.progress_string.set('Progresso...')
-        self.progress_lb = tk.Label(self.frm_buttons, textvariable=self.progress_string)
+        self.progress_lb = tk.Label(self, textvariable=self.progress_string)
+        self.progress_lb.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.btn_sociais = tk.Button(master=self.frm_buttons, text='EXTRAIR DADOS SOCIAIS', command=self.btn_sociais_click)
-        self.btn_sociais.pack(fill=tk.X)
-
-        self.btn_tentativas = tk.Button(master=self.frm_buttons, text='EXTRAIR DADOS DAS TENTATIVAS DE SOLUCAO', command=self.btn_tentativas_click)
-        self.btn_tentativas.pack(fill=tk.X)
-
-        self.btn_solucoes = tk.Button(master=self.frm_buttons, text='EXTRAIR MÉTRICAS DE CÓDIGOS DOS ESTUDANTES', command=self.btn_solucoes_click)
-        self.btn_solucoes.pack(fill=tk.X)
-
-        self.btn_mouve = tk.Button(master=self.frm_buttons, text='EXTRAIR EVENTOS DE MOUSE EM ATIVIDADES', command=self.btn_mouse_click)
-        self.btn_mouve.pack(fill=tk.X)
-
-        self.progress_lb.pack(fill=tk.X)
-
-        self.root.mainloop()
+        self.mainloop()
 
     def get_dataset_path(self):
-        MainScreen.__dataset_path = self.dataset_path.get()
-        return MainScreen.__dataset_path
+        return self.dataset_path.get()
 
     def btn_sociais_click(self):
         try:

@@ -8,22 +8,22 @@ import os
 from datetime import datetime
 
 
+# TODO verificar qual utilidade dessa classe
 class StringUtil:
-
     abc = ''
 
 
 class Logger:
 
-    __path = os.path.join(os.getcwd(), 'logs')
+    LOGS_DIR = os.path.join(os.getcwd(), 'logs')
     __cblogger = None
 
     @staticmethod
     def configure():
         logging.basicConfig(level=logging.INFO)
 
-        if not os.path.exists(Logger.__path):
-            os.mkdir(Logger.__path)
+        if not os.path.exists(Logger.LOGS_DIR):
+            os.mkdir(Logger.LOGS_DIR)
 
         formatter = logging.Formatter('%(asctime)s %(name)s [%(levelname)s]: %(message)s')
         data_hoje = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -31,17 +31,17 @@ class Logger:
         if not Logger.__cblogger:
             Logger.__cblogger = logging.getLogger('cblogger')
 
-            ifh = logging.FileHandler(os.path.join(Logger.__path, f'{data_hoje}_info.log'))
+            ifh = logging.FileHandler(os.path.join(Logger.LOGS_DIR, f'{data_hoje}_info.log'))
             ifh.setLevel(level=logging.INFO)
             ifh.setFormatter(formatter)
             Logger.__cblogger.addHandler(ifh)
 
-            wfh = logging.FileHandler(os.path.join(Logger.__path, f'{data_hoje}_warn.log'))
+            wfh = logging.FileHandler(os.path.join(Logger.LOGS_DIR, f'{data_hoje}_warn.log'))
             wfh.setLevel(level=logging.WARNING)
             wfh.setFormatter(formatter)
             Logger.__cblogger.addHandler(wfh)
 
-            efh = logging.FileHandler(os.path.join(Logger.__path, f'{data_hoje}_error.log'))
+            efh = logging.FileHandler(os.path.join(Logger.LOGS_DIR, f'{data_hoje}_error.log'))
             efh.setLevel(level=logging.ERROR)
             efh.setFormatter(formatter)
             Logger.__cblogger.addHandler(efh)
