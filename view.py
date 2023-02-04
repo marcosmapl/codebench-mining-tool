@@ -7,8 +7,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-from controller import PeriodoController, TurmaController, AtividadeController, UsuarioController, \
-    TentativaController, AcessoController, NotaController, MousemoveController, CodeMirrorController, SolucaoEstudanteController
+from miner import CodebenchMiner
 from util import Logger
 
 
@@ -46,11 +45,11 @@ class MainScreen(tk.Tk):
 
         self.lbl_codebench_path = ttk.Label(master=self, text='INSIRA O CAMINHO PARA O DATASET CODEBENCH: ', style='cbminer.label.TLabel')
         self.lbl_codebench_path.place(x=25, y=25)
-        self.ent_codebench_path = tk.Entry(master=self, width=120, textvariable=self.dataset_path)
+        self.ent_codebench_path = tk.Entry(master=self, width=105, textvariable=self.dataset_path)
         self.ent_codebench_path.place(x=25, y=60)
 
         self.frm_opcoes = tk.LabelFrame(master=self, text='OPÇÕES DE EXTRAÇÃO   ', bg=MainScreen.COLOR_BACKGROUND, fg=MainScreen.COLOR_FOREGROUND)
-        self.frm_opcoes.place(x=25, y=105, width=1000, height=240)
+        self.frm_opcoes.place(x=25, y=105, width=850, height=240)
 
         self.var_extrair_social = tk.BooleanVar()
         self.check_social = tk.Checkbutton(
@@ -116,8 +115,8 @@ class MainScreen(tk.Tk):
         )
         self.check_mousemove.place(x=15, y=90)
 
-        self.btn_extrair = tk.Button(master=self, text='EXTRAIR', font=('Arial', 24), bg=MainScreen.COLOR_EDEN, foreground=MainScreen.COLOR_PASTEL_GRAY, activeforeground=MainScreen.COLOR_EDEN)
-        self.btn_extrair.place(x=860, y=360)
+        self.btn_extrair = tk.Button(master=self, text='EXTRAIR', command=self.btn_extrair_click, font=('Arial', 24), bg=MainScreen.COLOR_EDEN, foreground=MainScreen.COLOR_PASTEL_GRAY, activeforeground=MainScreen.COLOR_EDEN)
+        self.btn_extrair.place(x=700, y=360)
 
         self.progress_string = tk.StringVar()
         self.progress_string.set('Progresso...')
@@ -128,6 +127,15 @@ class MainScreen(tk.Tk):
 
     def get_dataset_path(self):
         return self.dataset_path.get()
+
+    def btn_extrair_click(self):
+        opcoes = dict()
+        opcoes[CodebenchMiner.OPTION_SOCIAL_DATA] = self.var_extrair_social.get()
+        opcoes[CodebenchMiner.OPTION_TENTATIVAS_DATA] = self.var_extrair_tentativas.get()
+        opcoes[CodebenchMiner.OPTION_METRICAS_DATA] = self.var_extrair_metricas.get()
+        opcoes[CodebenchMiner.OPTION_MOUSEMOVE_DATA] = self.var_extrair_mousemove.get()
+        print("OPCOESSSSSSSSSSSSSSSSSSSSSSSSSS", opcoes)
+        CodebenchMiner.extract(self.get_dataset_path(), opcoes)
 
     def btn_sociais_click(self):
         try:

@@ -5,7 +5,7 @@
 
 import os
 
-from controller import EntityController
+from miner import CodebenchMiner
 from util import Logger
 from view import MainScreen
 
@@ -15,6 +15,6 @@ if __name__ == '__main__':
     # configura o módulo de log
     Logger.configure()
     # cria a pasta para os arquivos de saídade (CSV), caso já exista, recria os arquivos
-    EntityController.create_output_dir()
+    CodebenchMiner.create_output_dir()
     # inicia a tela principal da aplicação
-    MainScreen('Codebench Extration Tool', __version__, 1050, 450)
+    MainScreen('Codebench Extration Tool', __version__, 900, 450)

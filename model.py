@@ -20,13 +20,16 @@ class Entidade:
 class Periodo(Entidade):
     """Entidade que representa um Período letivo."""
 
-    def __init__(self, descricao, n_turmas, n_atividades, n_estudantes, n_codes, n_tentativas, path):
+    def __init__(self, descricao, n_turmas, n_atividades, n_estudantes, n_codes, n_tentativas, n_cmirrors, n_grades, n_mousemoves, path):
         self.descricao = descricao
         self.n_turmas = n_turmas
         self.n_atividades = n_atividades
         self.n_estudantes = n_estudantes
         self.n_codes = n_codes
         self.n_tentativas = n_tentativas
+        self.n_cmirrors = n_cmirrors
+        self.n_grades = n_grades
+        self.n_mousemoves = n_mousemoves
         self.path = path
         self.turmas = []
 
@@ -38,19 +41,23 @@ class Periodo(Entidade):
             self.n_estudantes,
             self.n_codes,
             self.n_tentativas,
+            self.n_cmirrors,
+            self.n_grades,
+            self.n_mousemoves
         ]
 
     @staticmethod
     def get_lista_atributos():
-        return list(Periodo(None, None, None, None, None, None, None).__dict__)[:-2]
+        return list(Periodo(None, None, None, None, None, None, None, None, None, None).__dict__)[:-2]
 
 
 class Turma(Entidade):
     """Entidade que representa uma Turma de Estudantes num :class:`Periodo` letivo."""
 
-    def __init__(self, periodo, codigo, n_atividades, n_estudantes, path):
+    def __init__(self, periodo, codigo, descricao, n_atividades, n_estudantes, path):
         self.periodo = periodo
         self.codigo = codigo
+        self.descricao = descricao
         self.n_atividades = n_atividades
         self.n_estudantes = n_estudantes
         self.path = path
@@ -59,13 +66,14 @@ class Turma(Entidade):
         return [
             self.periodo,
             self.codigo,
+            self.descricao,
             self.n_atividades,
             self.n_estudantes
         ]
 
     @staticmethod
     def get_lista_atributos():
-        return list(Turma(None, None, None, None, None).__dict__)[:-1]
+        return list(Turma(None, None, None, None, None, None).__dict__)[:-1]
 
 
 class Atividade(Entidade):
