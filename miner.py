@@ -209,8 +209,12 @@ class CodebenchMiner:
         try:
             v = ComplexityVisitor.from_code(codigo)
             setattr(solucao, 'complexity', v.complexity)
-            setattr(solucao, 'n_functions', v.functions)
-            setattr(solucao, 'n_classes', v.classes)
+            setattr(solucao, 'n_classes', len(v.classes))
+            setattr(solucao, 'n_functions', len(v.functions))
+            setattr(solucao, 'funcs_complexity', v.functions_complexity)
+            setattr(solucao, 'classes_complexity', v.functions_complexity)
+            setattr(solucao, 'total_complexity', v.total_complexity)
+            setattr(solucao, 'n_blocks', len(v.blocks))
         except BaseException as err:
             Logger.error(f'FALHA AO EXTRAIR METRICAS DE COMPLEXIDADE: {err}')
 
@@ -228,10 +232,10 @@ class CodebenchMiner:
 
         try:
             h = h_visit(codigo)
-            setattr(solucao, 'h1', h.h1)
-            setattr(solucao, 'h2', h.h2)
-            setattr(solucao, 'N1', h.N1)
-            setattr(solucao, 'N2', h.N2)
+            setattr(solucao, 'h1', h.total.h1)
+            setattr(solucao, 'h2', h.total.h2)
+            setattr(solucao, 'N1', h.total.N1)
+            setattr(solucao, 'N2', h.total.N2)
             setattr(solucao, 'h', h.total.vocabulary)
             setattr(solucao, 'N', h.total.length)
             setattr(solucao, 'calculated_N', h.total.calculated_length)
@@ -249,7 +253,9 @@ class CodebenchMiner:
             unique_strings = set()
             unique_btype = set()
             unique_bfunc = set()
-            with tokenize.open(path) as f:
+            with open(os.path.join(os.getcwd(), 'temp_code.py'), 'w', encoding=CodebenchMiner.DEFAULT_FILE_ENCODING) as temp_code:
+                temp_code.write(codigo)
+            with tokenize.open(os.path.join(os.getcwd(), 'temp_code.py')) as f:
                 try:
                     tokens = tokenize.generate_tokens(f.readline)
                     for tk in tokens:
@@ -261,10 +267,10 @@ class CodebenchMiner:
                         elif tk.type == token.NAME:
                             if keyword.iskeyword(tk.string):
                                 token_count[tkm.tk_codes.get(tk.string.lower(), tkm.KEYWORD)] += 1
-                            elif SolucaoEstudanteController.__is_builtin_type(tk.string):
+                            elif tk.string in CodebenchMiner.CODE_BUILTIN_TYPES_LIST:
                                 token_count[tkm.BUILTIN_TYPE] += 1
                                 unique_btype.add(tk.string)
-                            elif SolucaoEstudanteController.__is_builtin_func(tk.string):
+                            elif tk.string in CodebenchMiner.CODE_BUILTIN_FUNCS_LIST:
                                 if tk.string == 'print':
                                     token_count[tkm.KWD_PRINT] += 1
                                 elif tk.string == 'input':
@@ -286,12 +292,12 @@ class CodebenchMiner:
             for k, v in Counter(token_count).items():
                 setattr(solucao, tkm.tk_names[k], v)
 
-            setattr(solucao, 'builtin_type_unique', len(unique_btype))
-            setattr(solucao, 'builtin_func_unique', len(unique_bfunc))
-            setattr(solucao, 'identifiers_unique', len(unique_identifiers))
-            setattr(solucao, 'identifiers_max_len', max([len(x) for x in unique_identifiers]))
-            setattr(solucao, 'identifiers_min_len', min([len(x) for x in unique_identifiers]))
-            setattr(solucao, 'identifiers_mean_len', statistics.mean([len(x) for x in unique_identifiers]))
+            setattr(solucao, 'builtin_type_unique', len(unique_btype) if unique_btype else 0)
+            setattr(solucao, 'builtin_func_unique', len(unique_bfunc) if unique_bfunc else 0)
+            setattr(solucao, 'identifiers_unique', len(unique_identifiers) if unique_identifiers else 0)
+            setattr(solucao, 'identifiers_max_len', max([len(x) for x in unique_identifiers]) if unique_identifiers else 0)
+            setattr(solucao, 'identifiers_min_len', min([len(x) for x in unique_identifiers]) if unique_identifiers else 0)
+            setattr(solucao, 'identifiers_mean_len', statistics.mean([len(x) for x in unique_identifiers]) if unique_identifiers else 0)
 
         except BaseException as err:
             Logger.error(f'FALHA AO EXTRAIR MÉTRICAS DE TOKENS: {err}')
@@ -316,47 +322,35 @@ class CodebenchMiner:
                     datahora = datahora.strip()[:-1]
                     code_section, *sub_sections = sub_sections
                     # TODO if sucessful attempt, extract code metrics
-                    code = code_section[5:].strip()
+                    codigo_estudante = code_section[5:].strip()
                     tentativa = Tentativa(periodo, turma, usuario, atividade, questao, seq_attempt, tipo, datahora)
-                    tentativas.append(tentativa.as_list())
-                    if tentativa.tipo.lower() == 'test':
-                        for sub_section in sub_sections:
-                            if sub_section.startswith('OUTPUT'):
-                                # tentativa.code_output = sub_section.split(':')[1].lstrip()
-                                pass
-                            elif sub_section.startswith('ERROR:'):
-                                tentativa.has_err = True
-                                tentativa.err_msg = sub_section[7:]
-                                err_types = err_pattern.findall(tentativa.err_msg)
-                                if len(err_types) > 0:
-                                    tentativa.err_type = err_types[0]
-                                else:
-                                    tentativa.err_type = 'Exception'
-                    elif tentativa.tipo.lower() == 'submition':
-                        exec_time, *sub_sections = sub_sections
-                        tentativa.exec_time = exec_time.split(':\n')[1]
-                        tentativa.tcases_results = []
-                        tentativa.n_tcases = 0
-                        for sub_section in sub_sections:
-                            if sub_section.startswith('TEST CASE'):
-                                test_seq = sub_section.split('\n---- ')
-                                corr_output = test_seq[-2].split(':\n')[-1]
-                                usr_output = test_seq[-1].split(':\n')[-1]
-                                if corr_output == usr_output:
-                                    tentativa.tcases_results.append(True)
-                                else:
-                                    tentativa.tcases_results.append(False)
-                                tentativa.n_tcases += 1
-                            elif sub_section.startswith('GRADE'):
-                                tentativa.grade = sub_section.split(':')[1].strip()
+                    tentativa.tcases_results = []
+                    tentativa.n_tcases = 0
+                    for sub_section in sub_sections:
+                        if sub_section.startswith('EXE'): #EXECUTION TIME
+                            tentativa.exec_time = sub_section.split(':\n')[1]
+                        elif sub_section.startswith('TES'): #TEST CAS
+                            test_seq = sub_section.split('\n---- ')
+                            corr_output = test_seq[2].split(':\n')[-1]
+                            usr_output = test_seq[3].split(':\n')[-1]
+                            if corr_output == usr_output:
+                                tentativa.tcases_results.append(True)
                             else:
-                                tentativa.has_err = True
-                                tentativa.err_msg = sub_section[7:]
-                                err_types = err_pattern.findall(tentativa.err_msg)
-                                if len(err_types) > 0:
-                                    tentativa.err_type = err_types[0]
-                                else:
-                                    tentativa.err_type = 'Exception'
+                                tentativa.tcases_results.append(False)
+                            tentativa.n_tcases += 1
+                        elif sub_section.startswith('GRA'): #GRADE
+                            tentativa.grade = sub_section.split(':')[1].strip()
+                        elif sub_section.startswith('ERROR:'):
+                            tentativa.has_err = True
+                            tentativa.err_msg = sub_section[7:]
+                            err_types = err_pattern.findall(tentativa.err_msg)
+                            if len(err_types) > 0:
+                                tentativa.err_type = err_types[0]
+                            else:
+                                tentativa.err_type = 'Exception'
+                    if not tentativa.has_err:
+                        CodebenchMiner.__extrair_metricas_codigo(tentativa, codigo_estudante)
+                    tentativas.append(tentativa.as_list())
                     seq_attempt += 1
         return tentativas
 

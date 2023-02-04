@@ -95,7 +95,8 @@ class MainScreen(tk.Tk):
             highlightbackground=MainScreen.COLOR_BACKGROUND, 
             activebackground=MainScreen.COLOR_BACKGROUND, 
             activeforeground=MainScreen.COLOR_OCEAN_GREEN, 
-            selectcolor=MainScreen.COLOR_OCEAN_GREEN
+            selectcolor=MainScreen.COLOR_OCEAN_GREEN,
+            state='disabled'
         )
         self.check_metricas.place(x=15, y=65)
 
@@ -111,7 +112,8 @@ class MainScreen(tk.Tk):
             highlightbackground=MainScreen.COLOR_BACKGROUND, 
             activebackground=MainScreen.COLOR_BACKGROUND, 
             activeforeground=MainScreen.COLOR_OCEAN_GREEN, 
-            selectcolor=MainScreen.COLOR_OCEAN_GREEN
+            selectcolor=MainScreen.COLOR_OCEAN_GREEN,
+            state='disabled'
         )
         self.check_mousemove.place(x=15, y=90)
 
@@ -136,6 +138,7 @@ class MainScreen(tk.Tk):
         opcoes[CodebenchMiner.OPTION_MOUSEMOVE_DATA] = self.var_extrair_mousemove.get()
         print("OPCOESSSSSSSSSSSSSSSSSSSSSSSSSS", opcoes)
         CodebenchMiner.extract(self.get_dataset_path(), opcoes)
+        messagebox.showinfo('EXTRAÇÃO FINALIZADA', 'OS DADOS SOLICITADOS FORAM EXTRAÍDOS COM SUCESSO')
 
     def btn_sociais_click(self):
         try:
