@@ -22,7 +22,6 @@ from radon.visitors import ComplexityVisitor
 from util import Logger
 from model import *
 
-
 class CodebenchMiner:
     # diretório dos arquivos de saída '.csv' (datasets)
     CSV_FILE_OUTPUT_DIR = os.path.join(os.getcwd(), 'csv')
@@ -90,29 +89,34 @@ class CodebenchMiner:
         'sorted', 'staticmethod', 'str', 'sum', 'super', 'tuple', 'type', 'vars', 'zip'
     ]
 
+
     @staticmethod
-    def extract(path: str, opcoes: dict):
+    def extract(path: str, opcoes: dict, view):
         print(path)
         periodos = []
         turmas = []
         atividades = []
         usuarios = []
         tentativas = []
+        solucoes = []
 
         # TODO trocar 'prints' por 'logs' do sistema
         for periodo_dir in os.scandir(path):
             periodo = Periodo(periodo_dir.path.split(os.path.sep)[-1], 0, 0, 0, 0, 0, 0, 0, 0, periodo_dir.path)
             Logger.info(f'NOVO PERIODO ENCONTRADO: {periodo.path}')
+            view.update_extraction_status(f'NOVO PERIODO ENCONTRADO: {periodo.path}')
             
             for turma_dir in os.scandir(periodo.path):
                 periodo.n_turmas += 1
-                Logger.info(f'NOVA TURMA ENCONTRADA: {turma_dir.path}')
+                Logger.info(f'NOVA TURMA ENCONTRADA: {turma_dir.path}')    
+                view.update_extraction_status(f'NOVA TURMA ENCONTRADA: {turma_dir.path}')
                 turma =  CodebenchMiner.__extrair_turma(periodo.descricao, turma_dir.path)
                 
                 for atividade_log in os.scandir(os.path.join(turma_dir.path, 'assessments')):
                     periodo.n_atividades += 1
                     turma.n_atividades += 1
                     Logger.info(f'NOVO LOG DE ATIVIDADE ENCONTRADO: {atividade_log.path}')
+                    view.update_extraction_status(f'NOVO LOG DE ATIVIDADE ENCONTRADO: {atividade_log.path}')
                     atividade = CodebenchMiner.__extrair_atividade(periodo.descricao, turma.codigo, atividade_log.path)
                     atividades.append(atividade.as_list())
                 
@@ -122,6 +126,7 @@ class CodebenchMiner:
 
                     if opcoes.get(CodebenchMiner.OPTION_SOCIAL_DATA, False):
                         Logger.info(f'NOVO DIRETORIO DE USUARIO: {usuario_dir.path}')
+                        view.update_extraction_status(f'NOVO DIRETORIO DE USUARIO: {usuario_dir.path}')
                         usuario = CodebenchMiner.__extrair_usuario(periodo.descricao, turma.codigo, usuario_dir.path)
                         usuarios.append(usuario.as_list())
                     
@@ -129,14 +134,18 @@ class CodebenchMiner:
                         for tentativas_log in os.scandir(os.path.join(usuario_dir.path, 'executions')):
                             periodo.n_tentativas += 1
                             Logger.info(f'NOVO LOG DE TENTATIVAS DE USUARIO: {tentativas_log.path}')
+                            view.update_extraction_status(f'NOVO LOG DE TENTATIVAS DE USUARIO: {tentativas_log.path}')
                             tentativas2 = CodebenchMiner.__extrair_tentativas(periodo.descricao, turma.codigo, usuario_dir.path.split(os.path.sep)[-1], tentativas_log.path)
                             tentativas.extend(tentativas2)
 
                     if opcoes.get(CodebenchMiner.OPTION_METRICAS_DATA, False):
-                        for code in os.scandir(os.path.join(usuario.path, 'codes')):
+                        for solution_file in os.scandir(os.path.join(usuario_dir.path, 'codes')):
                             periodo.n_codes += 1
-                            print('NOVO CODIGO ', code.path)
-                            # TODO extrair métricas código
+                            Logger.info(f'NOVO CODIGO SOLUCAO ESTUDANTE: {solution_file.path}')
+                            view.update_extraction_status(f'NOVO CODIGO SOLUCAO ESTUDANTE: {solution_file.path}')
+                            usuario = usuario_dir.path.split(os.pathsep)[-1]
+                            solucao = CodebenchMiner.__extrair_metricas_solucao_estudantes(periodo.descricao, turma.codigo, usuario, solution_file.path)
+                            solucoes.append(solucao.as_list())
 
                     if opcoes.get(CodebenchMiner.OPTION_CODEMIRROR_DATA, None):    
                         for mirror in os.scandir(os.path.join(usuario.path, 'codemirror')):
@@ -162,34 +171,49 @@ class CodebenchMiner:
         # salva os períodos letivos num arquivo csv
         CodebenchMiner.persist(
             periodos,
-            os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.PERIODO_CSV_FILENAME), Periodo.get_lista_atributos()
+            os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.PERIODO_CSV_FILENAME), 
+            Periodo.get_lista_atributos()
         )
 
         # salva as turmas num arquivo csv
         CodebenchMiner.persist(
             turmas,
-            os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.TURMA_CSV_FILENAME), Turma.get_lista_atributos()
+            os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.TURMA_CSV_FILENAME), 
+            Turma.get_lista_atributos()
         )
 
         # salva as atividades num arquivo csv
         CodebenchMiner.persist(
             atividades,
-            os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.ATIVIDADE_CSV_FILENAME), Atividade.get_lista_atributos()
+            os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.ATIVIDADE_CSV_FILENAME), 
+            Atividade.get_lista_atributos()
         )
 
         if opcoes[CodebenchMiner.OPTION_SOCIAL_DATA]:
             # salva as atividades num arquivo csv
             CodebenchMiner.persist(
                 usuarios,
-                os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.USUARIO_CSV_FILENAME), Usuario.get_lista_atributos()
+                os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.USUARIO_CSV_FILENAME), 
+                Usuario.get_lista_atributos()
             )
 
         if opcoes[CodebenchMiner.OPTION_TENTATIVAS_DATA]:   
             # salva as atividades num arquivo csv
             CodebenchMiner.persist(
                 tentativas,
-                os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.TENTATIVA_CSV_FILENAME), Tentativa.get_lista_atributos()
+                os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.TENTATIVA_CSV_FILENAME), 
+                Tentativa.get_lista_atributos()
             )
+        
+        if opcoes[CodebenchMiner.OPTION_METRICAS_DATA]:   
+            # salva as metricas de solucao num arquivo csv
+            CodebenchMiner.persist(
+                solucoes,
+                os.path.join(CodebenchMiner.CSV_FILE_OUTPUT_DIR, CodebenchMiner.METRICAS_ESTUDANTE_CSV_FILENAME),
+                SolucaoEstudante.get_lista_atributos()
+            )
+
+        view.update_extraction_status(f'EXTRAÇÃO FINALIZADA!')
 
     @staticmethod
     def __extrair_metricas_solucao_estudantes(periodo: str, turma: str, usuario: str, path: str):

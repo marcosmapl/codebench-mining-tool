@@ -22,6 +22,9 @@ class MainScreen(tk.Tk):
     COLOR_PASTEL_GRAY = '#CAD2C5'
     COLOR_BACKGROUND = COLOR_DARK_GRAY
     COLOR_FOREGROUND = COLOR_PASTEL_GRAY
+    
+    PROGRESS_STRING = None
+    PROGRESS_LABEL = None
 
     def __init__(self, name: str, version: str, screen_width: int, screen_height: int):
         super().__init__()
@@ -95,8 +98,7 @@ class MainScreen(tk.Tk):
             highlightbackground=MainScreen.COLOR_BACKGROUND, 
             activebackground=MainScreen.COLOR_BACKGROUND, 
             activeforeground=MainScreen.COLOR_OCEAN_GREEN, 
-            selectcolor=MainScreen.COLOR_OCEAN_GREEN,
-            state='disabled'
+            selectcolor=MainScreen.COLOR_OCEAN_GREEN
         )
         self.check_metricas.place(x=15, y=65)
 
@@ -120,12 +122,16 @@ class MainScreen(tk.Tk):
         self.btn_extrair = tk.Button(master=self, text='EXTRAIR', command=self.btn_extrair_click, font=('Arial', 24), bg=MainScreen.COLOR_EDEN, foreground=MainScreen.COLOR_PASTEL_GRAY, activeforeground=MainScreen.COLOR_EDEN)
         self.btn_extrair.place(x=700, y=360)
 
-        self.progress_string = tk.StringVar()
-        self.progress_string.set('Progresso...')
-        self.progress_lb = tk.Label(self, textvariable=self.progress_string)
-        self.progress_lb.pack(side=tk.BOTTOM, fill=tk.X)
+        MainScreen.PROGRESS_STRING = tk.StringVar()
+        MainScreen.PROGRESS_STRING.set('Progresso...')
+        MainScreen.PROGRESS_LABEL = tk.Label(self, textvariable=MainScreen.PROGRESS_STRING)
+        MainScreen.PROGRESS_LABEL.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.mainloop()
+
+    def update_extraction_status(self, status: str):
+        self.PROGRESS_STRING.set(status)
+        self.PROGRESS_LABEL.update_idletasks()
 
     def get_dataset_path(self):
         return self.dataset_path.get()
@@ -136,33 +142,10 @@ class MainScreen(tk.Tk):
         opcoes[CodebenchMiner.OPTION_TENTATIVAS_DATA] = self.var_extrair_tentativas.get()
         opcoes[CodebenchMiner.OPTION_METRICAS_DATA] = self.var_extrair_metricas.get()
         opcoes[CodebenchMiner.OPTION_MOUSEMOVE_DATA] = self.var_extrair_mousemove.get()
-        print("OPCOESSSSSSSSSSSSSSSSSSSSSSSSSS", opcoes)
-        CodebenchMiner.extract(self.get_dataset_path(), opcoes)
+        CodebenchMiner.extract(self.get_dataset_path(), opcoes, self)
         messagebox.showinfo('EXTRAÇÃO FINALIZADA', 'OS DADOS SOLICITADOS FORAM EXTRAÍDOS COM SUCESSO')
 
-    def btn_sociais_click(self):
-        try:
-            p = self.__extract_periodos_from_dataset(self.get_dataset_path())
-            PeriodoController.persist(p)
-
-            t = self.__extract_turmas_from_dataset(p)
-            TurmaController.persist(t)
-
-            a = self.__extract_atividades_from_dataset(t)
-            AtividadeController.persist(a)
-
-            u = self.__extract_usuarios_from_dataset(t)
-            UsuarioController.persist(u)
-
-            ac = self.__extract_acessos_from_dataset(u)
-            AcessoController.persist(ac)
-
-            self.progress_string.set('CONCLUÍDO!!!')
-            self.progress_lb.update_idletasks()
-
-        except BaseException as err:
-            Logger.error(f'Erro ao extrair informações: {err}')
-
+"""
     def btn_tentativas_click(self):
         try:
             p = self.__extract_periodos_from_dataset(self.get_dataset_path())
@@ -292,3 +275,4 @@ class MainScreen(tk.Tk):
         for usuario in usuarios:
             acessos.extend(AcessoController.extract(usuario.path))
         return acessos
+"""
