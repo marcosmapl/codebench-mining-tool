@@ -54,6 +54,7 @@ codebench-mining-tool
 │ LICENSE
 │ README.md
 ```
+#### Main
 
 O arquivo `main.py` é o ponto de entrada do projeto, e por isso deve ser executado usando o interpretador Python. Ele recebe os caminho para o dataset já previamente descompactado por meio do argumento de linha de comando `-ds`, para que o extrator possa fazer uma varredura em toda a estrutura de pastas, identificando `períodos`, `turmas`, `atividades`, `usários`, `execuções` e `soluções`. Os argumentos aceitos pelo script são:
 
@@ -63,6 +64,8 @@ O arquivo `main.py` é o ponto de entrada do projeto, e por isso deve ser execut
 - `--logins` | `--no-logins`: Indica se as informações referentes aos logins efetuados pelos estudantes devem ser extraídas. Por padrão não serão extraídas (`--no-logins`).
 - `--grades` | `--no-grades`: Indica se as informações referentes às notas obtidas pelos estudantes nas atividades devem ser extraídas. Por padrão não serão extraídas (`--no-grades`).
 - `--codemirror` | `--no-codemirror`: Indica se as informações contidas nos logs do editor de texto (codemirror) utilizado pelos estudantes na resolução das questões devem ser extraídas. Por padrão não serão extraídas (`--no-codemirror`).
+
+#### Model
 
 O arquivo `model.py` contem a declaração de todas as classes de modelo de dados (entidades) utilizadas pelo extrator, e que posteriormente serão salvas em arquivos `.csv`. Essas entidades são:
 
@@ -77,11 +80,15 @@ O arquivo `model.py` contem a declaração de todas as classes de modelo de dado
 - `CodeMirror`: classe que representar um evento de interação do usuário (estudante) com o editor de código.
 - `Grade`: classe que representa o desempenho de um usuário (estudante) numa atividade.
 
+#### Util
+
 O arquivo `util.py` contem a declaração de variáveis, constantes e funções todos utilizados na extração das informações do dataset. Além disso a classe `Logger` também é implementada. Essa classe é reponsável pelo gerenciamento dos `logs` gerados pelo extrator. As informações um resumo de quais informações puderam ser extraídas e também registro de erros ocorridos durante o processo de extração são armazenados em arquivos de `log`. Os arquivos são salvos por padrão na pasta `logs`, criada na raiz do projeto. A cada execução são gerados três arquivos de `log` inciados pela data e hora de execução do extrator:
 
 - `<data_hoje>_info.log`: registra cada entidade encontrada pelo extrator.
 - `<data_hoje>_warn.log`: registra avisos de eventos não esperados durante a extração (ausência do código de solução ou arquivo corrompido, por exemplo).
 - `<data_hoje>_error.log`: registra as falhas ocorridas durante a extração. Em geral essas falhas são ocorridas na etapa de extração de métricas dos códigos de solução. Alguns destes códigos podem ser incompletos, gerando problemas para as bibliotecas de extração de métricas.
+
+#### Dependências
 
 O arquivo `requirements.txt` pode ser utilizado junto com o `pip` para instalar as dependências do projeto.
 
@@ -89,6 +96,26 @@ O arquivo `requirements.txt` pode ser utilizado junto com o `pip` para instalar 
 
  	-U: atualiza as dependências se já estiverem instaladas.
   	-r: arquivo com as dependências requeridas.
+
+#### Exemplo de uso
+
+Extraindo somente dos dados de períodos letivos, tumras, atividades e usuários: 
+	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8
+
+Extraindo também as execuções: 
+	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --executions
+
+Extraindo também as soluções: 
+	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --solutions
+
+Extraindo também as notas: 
+	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --grades
+
+Extraindo também os eventos de logins: 
+	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --logins
+
+Extraindo também os eventos do CodeMirror: 
+	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --codemirror
 
 ## Arquivos de saída
 
