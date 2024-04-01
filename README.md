@@ -98,77 +98,77 @@ As informações extraídas do dataset são estruturadas em arquivos `csv`.
 
 Os arquivo `semesters.csv` armazena das informações extraídas de todos os períodos letivos registrados:
 
-- desc (str): Uma string descrevendo o semestre.
-- n_courses (int): O número de cursos no semestre.
-- n_assignments (int): O número de atribuições no semestre.
-- n_users (int): O número de usuários associados ao semestre.
-- n_codes (int): O número de códigos de usuários associados ao semestre.
-- n_executions_files (int): O número de arquivos de log de execução do usuário no semestre.
-- n_executions (int): O número de execuções de usuários (submissões ou testes) no semestre.
-- n_mirror_files (int): O número de arquivos de log de espelhamento de código no semestre.
-- n_mirror_events (int): O número de eventos de espelhamento de código no semestre.
-- n_login_files (int): O número de arquivos de log de login no semestre.
-- n_login_events (int): O número de eventos de login/logout no semestre.
-- n_grades (int): O número de notas dos usuários associadas ao semestre.
+- `desc` (str): Uma string descrevendo o semestre.
+- `n_courses` (int): O número de cursos no semestre.
+- `n_assignments` (int): O número de atribuições no semestre.
+- `n_users` (int): O número de usuários associados ao semestre.
+- `n_codes` (int): O número de códigos de usuários associados ao semestre.
+- `n_executions_files` (int): O número de arquivos de log de execução do usuário no semestre.
+- `n_executions` (int): O número de execuções de usuários (submissões ou testes) no semestre.
+- `n_mirror_files` (int): O número de arquivos de log de espelhamento de código no semestre.
+- `n_mirror_events` (int): O número de eventos de espelhamento de código no semestre.
+- `n_login_files` (int): O número de arquivos de log de login no semestre.
+- `n_login_events` (int): O número de eventos de login/logout no semestre.
+- `n_grades` (int): O número de notas dos usuários associadas ao semestre.
 
 ### Turmas
 
 Os arquivo `courses.csv` armazena das informações extraídas de todas turmas registradas:
 
-- semester (str): O período letivo ou semestre ao qual o curso (disciplina) pertence.
-- code (str): O código ou identificador do curso (disciplina).
-- desc (str): Descrição do curso (disciplina).
-- n_assignments (int): Número de atividades associadas ao curso (disciplina).
-- n_users (int): Número de usuários matriculados no curso (disciplina).
+- `semester` (str): O período letivo ou semestre ao qual o curso (disciplina) pertence.
+- `code` (str): O código ou identificador do curso (disciplina).
+- `desc` (str): Descrição do curso (disciplina).
+- `n_assignments` (int): Número de atividades associadas ao curso (disciplina).
+- `n_users` (int): Número de usuários matriculados no curso (disciplina).
 
 ### Atividades
 
 Os arquivo `assignments.csv` armazena das informações extraídas de todas as atividades realizadas:
 
-- semester (str): O período letivo durante o qual a atividade é realizada.
-- course (str): O curso (disciplina) ao qual a atividade pertence.
-- code (str): Identificador único para a atividade.
-- title (str ou None): O título da atividade.
-- open_date (str ou None): A data em que a atividade é aberta.
-- close_date (str ou None): A data em que a atividade é fechada.
-- programming_lang (str ou None): A linguagem de programação usada para a atividade.
-- assignment_type (str ou None): O tipo de atividade (por exemplo, lição de casa, exame).
-- weight (float ou None): O peso/importância da atividade.
-- n_blocks (int ou None): O número de blocos de problemas na atividade.
-- blocks (lista): Uma lista contendo os blocos de problemas para a atividade.
+- `semester` (str): O período letivo durante o qual a atividade é realizada.
+- `course` (str): O curso (disciplina) ao qual a atividade pertence.
+- `code` (str): Identificador único para a atividade.
+- `title` (str ou None): O título da atividade.
+- `open_date` (str ou None): A data em que a atividade é aberta.
+- `close_date` (str ou None): A data em que a atividade é fechada.
+- `programming_lang` (str ou None): A linguagem de programação usada para a atividade.
+- `assignment_type` (str ou None): O tipo de atividade (por exemplo, lição de casa, exame).
+- `weight` (float ou None): O peso/importância da atividade.
+- `n_blocks` (int ou None): O número de blocos de problemas na atividade.
+- `blocks` (lista): Uma lista contendo os blocos de problemas para a atividade.
 
 ### Estudantes
 
 Os arquivo `users.csv` armazena das informações extraídas de todos os estudantes registrados:
 
-- semestre (str): O período letivo.
-- course (str): O nome do curso (disciplina) em que o usuário está matriculado.
-- código (str): Um código identificador único para o usuário.
-- course_id (str): O identificador único para o curso de graduação.
-- course_name (str): O nome do curso de gradução.
-- institution_id (str): O identificador único para a instituição.
-- institution_name (str): O nome da instituição.
-- high_school_name (str): O nome da escola secundária frequentada pelo usuário.
-- school_type (str): O tipo de escola secundária (por exemplo, pública, privada).
-- shift (str): O turno em que o usuário frequentou a escola secundária.
-- graduation_year (int): O ano em que o usuário se formou no ensino médio.
-- has_a_pc (bool): Se o usuário tem um computador pessoal.
-- share_this_pc (bool): Se o usuário compartilha seu computador pessoal.
-- this_pc_has (str): Especificações ou características do computador pessoal do usuário.
-- previous_experience_of (str): Experiência anterior do usuário no campo.
-- worked_or_interned (bool): Se o usuário trabalhou ou estagiou.
-- company_name (str): O nome da empresa onde o usuário trabalhou ou estagiou.
-- year_started_working (int): O ano em que o usuário começou a trabalhar.
-- year_stopped_working (int): O ano em que o usuário parou de trabalhar.
-- started_other_degree (bool): Se o usuário iniciou outro curso.
-- degree_course (str): O nome do outro curso de graduação.
-- institution_name_2 (str): O nome da instituição do outro curso.
-- year_started_this (int): O ano em que o usuário iniciou o outro curso.
-- year_stopped_this (int): O ano em que o usuário parou o outro curso.
-- sex (str): O sexo do usuário.
-- year_of_birth (int): O ano de nascimento do usuário.
-- civil_status (str): O estado civil do usuário (por exemplo, solteiro, casado).
-- have_kids (bool): Se o usuário tem filhos.
+- `semestre` (str): O período letivo.
+- `course` (str): O nome do curso (disciplina) em que o usuário está matriculado.
+- `code` (str): Um código identificador único para o usuário.
+- `course_id` (str): O identificador único para o curso de graduação.
+- `course_name` (str): O nome do curso de gradução.
+- `institution_id` (str): O identificador único para a instituição.
+- `institution_name` (str): O nome da instituição.
+- `high_school_name` (str): O nome da escola secundária frequentada pelo usuário.
+- `school_type` (str): O tipo de escola secundária (por exemplo, pública, privada).
+- `shift` (str): O turno em que o usuário frequentou a escola secundária.
+- `graduation_year` (int): O ano em que o usuário se formou no ensino médio.
+- `has_a_pc` (bool): Se o usuário tem um computador pessoal.
+- `share_this_pc` (bool): Se o usuário compartilha seu computador pessoal.
+- `this_pc_has` (str): Especificações ou características do computador pessoal do usuário.
+- `previous_experience_of` (str): Experiência anterior do usuário no campo.
+- `worked_or_interned` (bool): Se o usuário trabalhou ou estagiou.
+- `company_name` (str): O nome da empresa onde o usuário trabalhou ou estagiou.
+- `year_started_working` (int): O ano em que o usuário começou a trabalhar.
+- `year_stopped_working` (int): O ano em que o usuário parou de trabalhar.
+- `started_other_degree` (bool): Se o usuário iniciou outro curso.
+- `degree_course` (str): O nome do outro curso de graduação.
+- `institution_name_2` (str): O nome da instituição do outro curso.
+- `year_started_this` (int): O ano em que o usuário iniciou o outro curso.
+- `year_stopped_this` (int): O ano em que o usuário parou o outro curso.
+- `sex` (str): O sexo do usuário.
+- `year_of_birth` (int): O ano de nascimento do usuário.
+- `civil_status` (str): O estado civil do usuário (por exemplo, solteiro, casado).
+- `have_kids` (bool): Se o usuário tem filhos.
 
 ### Execuções
 
