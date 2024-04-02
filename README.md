@@ -99,23 +99,29 @@ O arquivo `requirements.txt` pode ser utilizado junto com o `pip` para instalar 
 
 #### Exemplo de uso
 
-Extraindo somente dos dados de períodos letivos, tumras, atividades e usuários: 
-	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8
+Extraindo somente informações básiscas (períodos letivos, turmas, atividades e usuários): 
+		
+  	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8
+	
+Extraindo informações básicas e também as execuções: 
 
-Extraindo também as execuções: 
-	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --executions
+  	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --executions
+	
+Extraindo informações básicas e também as soluções: 
 
-Extraindo também as soluções: 
-	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --solutions
+  	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --solutions
+	
+Extraindo informações básicas e também as notas: 
 
-Extraindo também as notas: 
-	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --grades
+  	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --grades
+	
+Extraindo informações básicas e também os eventos de logins: 
 
-Extraindo também os eventos de logins: 
-	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --logins
+  	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --logins
+	
+Extraindo informações básicas e também os eventos do CodeMirror: 
 
-Extraindo também os eventos do CodeMirror: 
-	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --codemirror
+  	python3 main.py -ds home/Documents/cb_dataset_2023_1_v1.8 --codemirror
 
 ## Arquivos de saída
 
