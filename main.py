@@ -10,6 +10,7 @@ import argparse
 import os
 import time
 import util
+import tarfile 
 
 from collections import Counter, defaultdict
 from datetime import datetime
@@ -190,14 +191,19 @@ if __name__ == "__main__":
             util.CODE_GRADE,
             util.CODE_CODEMIRROR
         ]}
-        start_time = time.time()
-        util.Logger.info(f'Starting extraction: {time.ctime(start_time)}')
         util.Logger.info(f'Extracting data from directory: {args.dataset}')
-        process_directories(args.dataset, data_lists)
+        file = tarfile.open(args.dataset)
+        file.extractall('data')
+        file.close()
+
+        start_time = time.time()
+        util.Logger.info(f'Starting Data Collection: {time.ctime(start_time)}')
+        process_directories('data', data_lists)
         end_time = time.time()
-        util.Logger.info(f'Extraction completed: {time.ctime(end_time)}')
+        util.Logger.info(f'Task Completed: {time.ctime(end_time)}')
         util.Logger.info(f'Duration: {end_time - start_time}s')
+
         util.save_to_csv(data_lists)
     else:
-        util.Logger.error("Dataset path is not provided. Exiting...")
+        util.Logger.error("Dataset path was not provided. Exiting...")
         exit(1)

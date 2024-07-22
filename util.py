@@ -404,22 +404,18 @@ def extract_user(semester: str, course: str, path: str):
     
     dict_obj = {}
     with open(os.path.join(path, USER_DATA_FILENAME), mode='r', encoding=DEFAULT_FILE_ENCODING) as f:
-        data = f.read()
-
         # Parse user data into a dictionary
-        for line in data.split(os.linesep):
-            if line.startswith('---- '):
-                line = line.replace('-', ' ').strip().lower()
+        for line in f.readlines():
+            if line.startswith('----'):
+                line = line[5:].strip().lower()
                 key, value = line.split(':', 1)
                 key = '_'.join(key.split(' ')[:3])
-                # line = line.split(' ', 3)
-                # print(f'{key} ==> {value}')
                 if key in dict_obj:
                     key = f'{key}_2'
                 dict_obj[key] = value
 
     for attribute in model.User.get_attr_names()[3:]:
-        setattr(new_user, attribute, dict_obj[attribute])
+        setattr(new_user, attribute, dict_obj.get(attribute, None))
 
     return new_user
 
@@ -747,6 +743,8 @@ def save_to_csv(data_dict):
     """
     # Log the path where the data will be saved for debugging and tracking purposes.
     Logger.info(f'Saving data into disk')
+
+    os.makedirs(os.path.join(os.getcwd(), CSV_FILE_OUTPUT_DIR)) 
 
     for key in data_dict.keys():
         if data_dict[key]:
